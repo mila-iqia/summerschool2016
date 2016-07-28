@@ -19,7 +19,7 @@ import numpy
 
 import theano
 import theano.tensor as T
-from theano.tensor.signal import downsample
+from theano.tensor.signal import pool
 from theano.tensor.nnet import conv
 
 import fuel
@@ -56,7 +56,7 @@ class LeNetConvPoolLayer(object):
                              image height, image width)
 
         :type poolsize: tuple or list of length 2
-        :param poolsize: the downsampling (pooling) factor (#rows, #cols)
+        :param poolsize: the pooling factor (#rows, #cols)
         """
 
         assert image_shape[1] == filter_shape[1]
@@ -92,8 +92,8 @@ class LeNetConvPoolLayer(object):
             image_shape=image_shape
         )
 
-        # downsample each feature map individually, using maxpooling
-        pooled_out = downsample.max_pool_2d(
+        # pool each feature map individually, using maxpooling
+        pooled_out = pool.pool_2d(
             input=conv_out,
             ds=poolsize,
             ignore_border=True
