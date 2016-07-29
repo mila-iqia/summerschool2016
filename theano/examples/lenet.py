@@ -32,16 +32,10 @@ import theano.tensor as T
 from theano.tensor.signal import pool
 from theano.tensor.nnet import conv
 
-import fuel
-from fuel.streams import DataStream
-from fuel.schemes import SequentialScheme
-from fuel.transformers import Cast
-from fuel.datasets import MNIST
-
 from logistic_sgd import LogisticRegression
 from mlp import HiddenLayer
 
-fuel.config.floatX = theano.config.floatX
+theano.config.floatX
 
 
 class LeNetConvPoolLayer(object):
@@ -119,14 +113,14 @@ class LeNetConvPoolLayer(object):
         self.params = [self.W, self.b]
 
 
-def evaluate_lenet5(train, test, valid,
+def evaluate_lenet5(train_set, test_set, valid_set,
                     learning_rate=0.1, n_epochs=200,
                     nkerns=[20, 50], batch_size=500):
     """ Demonstrates lenet on MNIST dataset
 
-    :param dataset train: Fuel dataset to use for training.
-    :param dataset test: Fuel dataset to use for testing.
-    :param dataset valid: Fuel dataset to use for validation.
+    :param dataset train_set: dataset to use for training.
+    :param dataset test_set: dataset to use for testing.
+    :param dataset valid_set: dataset to use for validation.
 
     :type learning_rate: float
     :param learning_rate: learning rate used (factor for the stochastic
@@ -141,24 +135,23 @@ def evaluate_lenet5(train, test, valid,
 
     rng = numpy.random.RandomState(23455)
 
-    train_stream = DataStream.default_stream(
-        train, iteration_scheme=SequentialScheme(train.num_examples,
-                                                 batch_size))
-    valid_stream = DataStream.default_stream(
-        valid, iteration_scheme=SequentialScheme(train.num_examples,
-                                                 batch_size))
-    test_stream = DataStream.default_stream(
-        test, iteration_scheme=SequentialScheme(train.num_examples,
-                                                batch_size))
+    # create a python generator that returns minibatches one at a time
+    def minibatch_generator(dataset):
+        dataset_x, dataset_y = dataset
+        for i in range(dataset_x.shape[0] // batch_size):
+            start_idx = i * batch_size
+            end_idx = (i + 1) * batch_size
+            batch_x = dataset_x[start_idx:end_idx]
+            batch_y = dataset_y[start_idx:end_idx]
+            yield (batch_x, batch_y)
 
-    x = T.tensor4('x')
-    yi = T.imatrix('y')
-    y = yi.reshape((yi.shape[0],))
+    x = T.matrix('x')
+    y = T.lvector('y')
 
     ######################
     # BUILD ACTUAL MODEL #
     ######################
-    print '... building the model'
+    print('... building the model')
 
     # Construct the first convolutional pooling layer:
     # filtering reduces the image size to (28-5+1 , 28-5+1) = (24, 24)
@@ -207,12 +200,12 @@ def evaluate_lenet5(train, test, valid,
 
     # create a function to compute the mistakes that are made by the model
     test_model = theano.function(
-        [x, yi],
+        [x, y],
         layer3.errors(y)
     )
 
     validate_model = theano.function(
-        [x, yi],
+        [x, y],
         layer3.errors(y)
     )
 
@@ -233,7 +226,7 @@ def evaluate_lenet5(train, test, valid,
     ]
 
     train_model = theano.function(
-        [x, yi],
+        [x, y],
         cost,
         updates=updates
     )
@@ -241,7 +234,7 @@ def evaluate_lenet5(train, test, valid,
     ###############
     # TRAIN MODEL #
     ###############
-    print '... training'
+    print('... training')
     # early-stopping parameters
     patience = 10000  # look as this many examples regardless
     patience_increase = 2  # wait this much longer when a new best is found
@@ -268,11 +261,11 @@ def evaluate_lenet5(train, test, valid,
         epoch = epoch + 1
 
         minibatch_index = 0
-        for minibatch in train_stream.get_epoch_iterator():
+        for minibatch in minibatch_generator(train_set):
             iter += 1
             minibatch_index += 1
             if iter % 100 == 0:
-                print 'training @ iter = ', iter
+                print('training @ iter = %i' % iter)
 
             error = train_model(minibatch[0], minibatch[1])
 
@@ -280,7 +273,7 @@ def evaluate_lenet5(train, test, valid,
 
                 # compute zero-one loss on validation set
                 validation_losses = [validate_model(vb[0], vb[1]) for vb
-                                     in valid_stream.get_epoch_iterator()]
+                                     in minibatch_generator(valid_set)]
                 this_validation_loss = numpy.mean(validation_losses)
                 print('epoch %i, minibatch %i/%i, validation error %f %%' %
                       (epoch, minibatch_index + 1, n_train_batches,
@@ -301,7 +294,7 @@ def evaluate_lenet5(train, test, valid,
                     # test it on the test set
                     test_losses = [
                         test_model(tb[0], tb[1])
-                        for tb in test_stream.get_epoch_iterator()
+                        for tb in minibatch_generator(test_set)
                     ]
                     test_score = numpy.mean(test_losses)
                     print(('     epoch %i, minibatch %i/%i, test error of '
