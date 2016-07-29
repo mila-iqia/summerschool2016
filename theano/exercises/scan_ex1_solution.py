@@ -11,7 +11,7 @@ def step(coeff, power, prior_value, free_var):
     return prior_value + (coeff * (free_var ** power))
 
 # Generate the components of the polynomial
-full_range = T.arange(max_coefficients_supported)
+full_range = T.arange(max_coefficients_supported, dtype='int16')
 outputs_info = np.zeros((), dtype=theano.config.floatX)
 
 components, updates = theano.scan(fn=step,
