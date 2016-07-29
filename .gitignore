@@ -87,3 +87,14 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# LaTeX stuff
+*.aux
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+
+# LaTeX minted
+_minted-*/
