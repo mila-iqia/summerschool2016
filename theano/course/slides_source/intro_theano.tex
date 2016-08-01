@@ -172,17 +172,17 @@ out = T.nnet.sigmoid(dot + b)
 \begin{frame}[fragile]{Graph visualization (1)}
   \begin{verbatim}
 debugprint(dot)
-dot [@A] ''   
- |x [@B]
- |W [@C]
+dot [id A] ''   
+ |x [id B]
+ |W [id C]
 
 debugprint(out)
-sigmoid [@A] ''   
- |Elemwise{add,no_inplace} [@B] ''   
-   |dot [@C] ''   
-   | |x [@D]
-   | |W [@E]
-   |b [@F]
+sigmoid [id A] ''   
+ |Elemwise{add,no_inplace} [id B] ''   
+   |dot [id C] ''   
+   | |x [id D]
+   | |W [id E]
+   |b [id F]
   \end{verbatim}
 \end{frame}
 
@@ -202,15 +202,15 @@ i = theano.function([x, W, b], [dot + b, out])
 \footnotesize
       \begin{verbatim}
 theano.printing.debugprint(f)
-CGemv{inplace} [@A] ''   3
- |AllocEmpty{dtype='float64'} [@B] ''   2
- | |Shape_i{1} [@C] ''   1
- |   |W [@D]
- |TensorConstant{1.0} [@E]
- |InplaceDimShuffle{1,0} [@F] 'W.T'   0
- | |W [@D]
- |x [@G]
- |TensorConstant{0.0} [@H]
+CGemv{inplace} [id A] ''   3
+ |AllocEmpty{dtype='float64'} [id B] ''   2
+ | |Shape_i{1} [id C] ''   1
+ |   |W [id D]
+ |TensorConstant{1.0} [id E]
+ |InplaceDimShuffle{1,0} [id F] 'W.T'   0
+ | |W [id D]
+ |x [id G]
+ |TensorConstant{0.0} [id H]
 
 theano.printing.pydotprint(f)
       \end{verbatim}
@@ -219,14 +219,14 @@ theano.printing.pydotprint(f)
 \footnotesize
       \begin{verbatim}
 theano.printing.debugprint(g)
-Elemwise{ScalarSigmoid}[(0, 0)] [@A] ''   2
- |CGemv{no_inplace} [@B] ''   1
-   |b [@C]
-   |TensorConstant{1.0} [@D]
-   |InplaceDimShuffle{1,0} [@E] 'W.T'   0
-   | |W [@F]
-   |x [@G]
-   |TensorConstant{1.0} [@D]
+Elemwise{ScalarSigmoid}[(0, 0)] [id A] ''   2
+ |CGemv{no_inplace} [id B] ''   1
+   |b [id C]
+   |TensorConstant{1.0} [id D]
+   |InplaceDimShuffle{1,0} [id E] 'W.T'   0
+   | |W [id F]
+   |x [id G]
+   |TensorConstant{1.0} [id D]
 
 theano.printing.pydotprint(g)
       \end{verbatim}
@@ -345,6 +345,8 @@ print(c.broadcastable)  # (False, True)
 
 f = theano.function([r, c], r + c)
 print(f([[1, 2, 3]], [[.1], [.2]]))
+# [[ 1.1  2.1  3.1]
+#  [ 1.2  2.2  3.2]]
   \end{minted}
 \end{frame}
 
@@ -467,12 +469,12 @@ print(cost_and_grads(x_val, W_val, b_val, y_val))
 upd_W = W - 0.1 * dC_dW
 upd_b = b - 0.1 * dC_db
 cost_and_upd = theano.function([x, W, b, y], [C, upd_W, upd_b])
-print cost_and_upd(x_val, W_val, b_val, y_val)
+print(cost_and_upd(x_val, W_val, b_val, y_val))
       \end{minted}
   \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{\tt pydotprint(cost\_and\_upd)}
   \includegraphics[width=\textwidth]{pydotprint_cost_and_upd.pdf}
 \end{frame}
 
@@ -543,7 +545,7 @@ cost_and_perform_updates = theano.function(
   \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{\tt pydotprint(cost\_and\_perform\_updates)}
   \includegraphics[width=\textwidth]{pydotprint_cost_and_perform_updates.pdf}
 \end{frame}
 
@@ -679,7 +681,7 @@ floatX = float32
 \end{frame}
 
 \subsection{Looping: the {\tt scan} operation}
-\begin{frame}[fragile]{Overview}
+\begin{frame}[fragile]{Overview of {\tt scan}}
   Symbolic looping
   \begin{itemize}
     \item Can perform map, reduce, reduce and accumulate, \ldots
@@ -712,7 +714,7 @@ final_result = result[-1]
 # compiled function that returns A**k
 power = theano.function(inputs=[A, k], outputs=final_result, updates=updates)
 
-print power(range(10), 2)
+print(power(range(10), 2))
 # [  0.   1.   4.   9.  16.  25.  36.  49.  64.  81.]
 print power(range(10), 4)
 # [  0.00000000e+00   1.00000000e+00   1.60000000e+01   8.10000000e+01
@@ -722,14 +724,18 @@ print power(range(10), 4)
 \end{frame}
 
 \subsection{Debugging}
-\begin{frame}{Visualization, debugging, and diagnostic tools}
+\begin{frame}[fragile]{Visualization, debugging, and diagnostic tools}
   The \emph{definition} of a Theano function is separate from its \emph{execution}.
   To help with this, we provide:
   \begin{itemize}
-  %TODO: integrate with notebook
     \item Information in error messages
-    \item Diagnostic tools
+    \item Get information at runtime
+    \item Monitor NaN or large value
+    \item Test values when building the graph
+    \item Detect common sources of slowness
+    \item Self-diagnostic tools
   \end{itemize}
+  See demo in \verb|Debug.ipynb|.
 \end{frame}
 
 \subsection{Extending Theano}
