@@ -1,0 +1,92 @@
+\documentclass[a4paper,9pt]{beamer}
+\usetheme{Malmoe}  % Base theme
+% Now we try to put MILA's colors
+\definecolor{MilaBlue1}{RGB}{78,179,225} % lighter, PMS 306
+\definecolor{MilaBlue2}{RGB}{35,154,204} % darker, PMS 639
+
+\setbeamercolor{structure}{fg=MilaBlue2}
+\setbeamercolor{title}{fg=MilaBlue1,bg=black}
+\setbeamercolor{section in head/foot}{fg=MilaBlue1,bg=black}
+\setbeamercolor{subsection in head/foot}{fg=MilaBlue2,bg=white}
+\setbeamercolor{frametitle}{fg=white,bg=MilaBlue2}
+
+\setbeamertemplate{footline}[page number]
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{minted}
+
+\usepackage[T1]{fontenc}
+\usepackage{inconsolata}
+
+% for copy-pastable ', we need the following
+\usepackage{upquote}
+\usepackage{textcomp}
+
+%\usepackage{ragged2e}
+%\usepackage{multirow}
+%\usepackage{fancyvrb}
+%\usepackage{color}
+\def\imagetop#1{\vtop{\null\hbox{#1}}}
+
+% Standard LaTeX stuff - note the optional abbreviated title being provided
+
+%% ALL that presentation slide are not used! We use a normal frame for that.
+\title[Labs]{Hands-on Theano}
+\author[MILA]{%
+Frédéric Bastien, Arnaud Bergeron, Pascal Lamblin, Simon Lefrançois \\
+Institut des algorithmes d'apprentissage de Montréal\\
+Montreal Institute for Learning Algorithms\\
+Université de Montréal}
+
+\date{%
+August 2nd, 2016, Montréal
+}
+
+\setbeamertemplate{navigation symbols}{}
+
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+  \includegraphics[width=1in]{MILA_official_2016.png}
+  \hfill
+  \includegraphics[width=1in]{UdeM_logo.pdf}
+\end{frame}
+
+
+\begin{frame}{Connection instructions}
+  The Theano and Torch labs share the same VM.
+  All the material is online at
+  \url{https://github.com/mila-udem/summerschool2016/}
+
+  \begin{itemize}
+    \item Navigate to \url{https://goo.gl/U7yPBC}
+    \item Enter your name and email. (DO THIS ONLY ONCE)
+    \item After a short wait, you will get an ip:port pair. Navigate to it.
+    \item Use the password writen on the board.
+    \item Open the notebook that you want to use.
+    \item Please ask us for help!
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Questions, Acknowledgements}
+\huge
+\begin{center}
+Questions?
+\end{center}
+\Large
+Acknowledgments
+\normalsize
+\begin{itemize}
+\item Thanks to NVIDIA for providing the AWS resources.
+\item Anyone that contributed to Theano in any way.
+\item Compute Canada, Compute Québec.
+\item NSERC, the Canada Research Chairs, and CIFAR for providing funding.
+\item The CRM and CIFAR for the organization.
+\end{itemize}
+\end{frame}
+
+\end{document}
